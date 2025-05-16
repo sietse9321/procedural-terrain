@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
@@ -6,12 +7,15 @@ public class MeshGenerator : MonoBehaviour
     [SerializeField] private bool drawGizmos;
     [SerializeField] MeshFilter meshFilter;
     [SerializeField] private Vector2Int size;
-    
-    [Header("Noise Settings")]
-    [SerializeField] private float noiseScale = 0.3f;    // Controls how "zoomed in" the noise is
-    [SerializeField] private float amplitude = 2f;        // Controls the maximum height
-    [SerializeField] [Range(-1f, 1f)] private float heightOffset = 0f;  // Shifts the entire terrain up or down
-    
+
+    [Header("Offset Settings")] [SerializeField]
+    Vector2 offset;
+
+    [Header("Noise Settings")] [SerializeField] [Range(0.01f, 0.99f)]
+    private float noiseScale = 0.3f;
+
+    [SerializeField] private float amplitude = 2f;
+
     Vector3[] vertices;
     Color[] colors;
 
@@ -27,7 +31,7 @@ public class MeshGenerator : MonoBehaviour
         mesh.vertices = CreateVertices();
         mesh.triangles = CreateTriangles();
         mesh.colors = colors;
-        
+
         mesh.RecalculateNormals();
         meshFilter = GetComponent<MeshFilter>();
         meshFilter.mesh = mesh;
@@ -37,36 +41,37 @@ public class MeshGenerator : MonoBehaviour
     {
         vertices = new Vector3[(size.x + 1) * (size.y + 1)];
         colors = new Color[vertices.Length];
-        
+
         float minHeight = float.MaxValue;
         float maxHeight = float.MinValue;
-        
-        // First pass: Generate heights and find min/max
+
+        //generate vertices
         for (int i = 0, z = 0; z <= size.y; z++)
         {
             for (int x = 0; x <= size.x; x++)
             {
-                float height = Mathf.PerlinNoise(x * noiseScale, z * noiseScale) * amplitude + heightOffset;
+                //generate height based on noise
+                float height = Mathf.PerlinNoise((x + offset.x) * noiseScale, (z + offset.y) * noiseScale) * amplitude;
                 vertices[i] = new Vector3(x, height, z);
-                
-                // Track min and max heights for normalization
+
                 minHeight = Mathf.Min(minHeight, height);
                 maxHeight = Mathf.Max(maxHeight, height);
-                
+
                 i++;
             }
         }
-        
+
         // Second pass: Normalize heights and set colors
         for (int i = 0; i < vertices.Length; i++)
         {
+            //normalize the height between 0 and 1
             float normalizedHeight = Mathf.InverseLerp(minHeight, maxHeight, vertices[i].y);
+            //sets the color of the vertex based on the normalized height
             colors[i] = Color.Lerp(Color.black, Color.white, normalizedHeight);
         }
-
         return vertices;
     }
-    
+
     private int[] CreateTriangles()
     {
         int[] triangles = new int[size.x * size.y * 6];
@@ -87,7 +92,7 @@ public class MeshGenerator : MonoBehaviour
 
             vert++;
         }
-        
+
         return triangles;
     }
 
