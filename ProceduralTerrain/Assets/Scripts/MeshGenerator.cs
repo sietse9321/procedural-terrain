@@ -49,7 +49,7 @@ public class MeshGenerator : MonoBehaviour
         for (int i = 0, z = 0; z <= size.y; z++)
         {
             for (int x = 0; x <= size.x; x++)
-            {
+            {   
                 //generate height based on noise
                 float height = Mathf.PerlinNoise((x + offset.x) * noiseScale, (z + offset.y) * noiseScale) * amplitude;
                 vertices[i] = new Vector3(x, height, z);

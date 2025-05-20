@@ -9,9 +9,4 @@ public class KeyboardInput : MonoBehaviour, IPlayerInput
         
         return new Vector2(horizontal, vertical);
     }
-
-    public bool GetJumpInput()
-    {
-        return Input.GetKeyDown(KeyCode.Space);
-    }
 }
