@@ -3,6 +3,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] private float rotationSpeed = 10f;
+    [SerializeField] private float moveSpeed = 10f;
     private IPlayerInput _input;
     private IMovement _movement;
     private Jump _jump;
@@ -24,6 +25,7 @@ public class Player : MonoBehaviour
         Cursor.visible = false;
 
         _mainCamera = Camera.main;
+        _movement.MoveSpeed = moveSpeed;
     }
 
     private void Update()
