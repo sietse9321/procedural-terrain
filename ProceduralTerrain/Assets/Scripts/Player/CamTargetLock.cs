@@ -1,34 +1,25 @@
 using Cinemachine;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class CamTargetLock : MonoBehaviour
 {
-    [SerializeField] private Transform player;       
-    [SerializeField] private Transform target;      
-    [SerializeField] private Camera mainCamera;
-    [SerializeField] private CinemachineFreeLook defaultCamera;
-    [SerializeField] private float distanceBehindPlayer = 10f;  
-    [SerializeField] private float heightOffset = 1.75f;          
-    [SerializeField] private float followSmoothing = 10f;       
-    [SerializeField] private float targetLockDistance = 4f;   
+    [SerializeField] Transform player;       
+    [SerializeField] Enemy currentTarget;
+    [SerializeField] Enemy[] enemiesInRange;
+    [SerializeField] Camera mainCamera;
+    [SerializeField] CinemachineFreeLook defaultCamera;
+    [SerializeField] float distanceBehindPlayer = 10f;  
+    [SerializeField] float heightOffset = 1.75f;          
+    [SerializeField] float followSmoothing = 10f;       
+    [SerializeField] float targetLockDistance = 4f;   
 
     private bool isTargetLocked = false;
 
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(2))
-        {
-            Debug.Log("Mouse 3 was pressed.");
-            isTargetLocked = !isTargetLocked;
-            
-            defaultCamera.gameObject.SetActive(!isTargetLocked);;
-            SetTargetLock(isTargetLocked); 
-        }
-    }
 
     private void LateUpdate()
     {
-        if (isTargetLocked && target != null)
+        if (isTargetLocked && currentTarget != null)
         {
             FollowTargetLock();
         }
@@ -41,7 +32,7 @@ public class CamTargetLock : MonoBehaviour
     private void FollowTargetLock()
     {
         //calculate a position relative to the midpoint between the player and target
-        Vector3 directionToTarget = (target.position - player.position).normalized;
+        Vector3 directionToTarget = (currentTarget.transform.position - player.position).normalized;
         Vector3 lockPosition = player.position - directionToTarget * targetLockDistance;
 
         //maintain height offset for clarity
@@ -51,11 +42,22 @@ public class CamTargetLock : MonoBehaviour
         mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, lockPosition, Time.deltaTime * followSmoothing);
 
         //make the camera look at the target
-        mainCamera.transform.LookAt(target);
+        mainCamera.transform.LookAt(currentTarget.transform);
     }
     
     public void SetTargetLock(bool lockOn)
     {
         isTargetLocked = lockOn;
+    }
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(2))
+        {
+            Debug.Log("Mouse 3 was pressed.");
+            isTargetLocked = !isTargetLocked;
+            
+            defaultCamera.gameObject.SetActive(!isTargetLocked);;
+            SetTargetLock(isTargetLocked); 
+        }
     }
 }
