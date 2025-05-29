@@ -46,8 +46,10 @@ public class MeshGenerator : MonoBehaviour
         mesh.colors = colors;
 
         mesh.RecalculateNormals();
+        mesh.normals = CalculateNormals(vertices);
         meshFilter = GetComponent<MeshFilter>();
         meshFilter.mesh = mesh;
+        AnalyzeMap();
     }
 
     private Vector3[] CreateVertices()
@@ -114,6 +116,7 @@ public class MeshGenerator : MonoBehaviour
         return triangles;
     }
 
+
     private float GenerateFractalNoise(float x, float z)
     {
         float totalNoise = 0f;
@@ -131,6 +134,31 @@ public class MeshGenerator : MonoBehaviour
 
         return totalNoise;
     }
+    private Vector3[] CalculateNormals(Vector3[] verts)
+    {
+        Vector3[] normals = new Vector3[verts.Length];
+        int width = size.x + 1;
+        int height = size.y + 1;
+
+        for (int z = 0; z < height; z++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                int index = z * width + x;
+
+                // Get surrounding heights with bounds checking
+                float hL = x > 0 ? verts[z * width + x - 1].y : verts[index].y;
+                float hR = x < width - 1 ? verts[z * width + x + 1].y : verts[index].y;
+                float hD = z > 0 ? verts[(z - 1) * width + x].y : verts[index].y;
+                float hU = z < height - 1 ? verts[(z + 1) * width + x].y : verts[index].y;
+
+                Vector3 normal = new Vector3(hL - hR, 2f, hD - hU).normalized;
+                normals[index] = normal;
+            }
+        }
+
+        return normals;
+    }
 
     private void OnDrawGizmos()
     {
@@ -139,6 +167,15 @@ public class MeshGenerator : MonoBehaviour
         for (int i = 0; i < vertices.Length; i++)
         {
             Gizmos.DrawSphere(vertices[i], 0.1f);
+        }
+    }
+
+    private void AnalyzeMap()
+    {
+        MapAnalyzer mapAnalyzer = GetComponent<MapAnalyzer>();
+        if (mapAnalyzer != null && vertices != null)
+        {
+            mapAnalyzer.PrintHighestValue(vertices);
         }
     }
 }

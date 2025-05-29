@@ -13,18 +13,9 @@ public class CamTargetLock : MonoBehaviour
     [SerializeField] float heightOffset = 1.75f;          
     [SerializeField] float followSmoothing = 10f;       
     [SerializeField] float targetLockDistance = 4f;   
-
-    private bool isTargetLocked = false;
-
-
-    private void LateUpdate()
-    {
-        if (isTargetLocked && currentTarget != null)
-        {
-            FollowTargetLock();
-        }
-    }
     
+    private bool isTargetLocked = false;
+    private int currentTargetIndex = 0;
 
     /// <summary>
     /// Moves the camera to lock onto the target while maintaining its distance from the player.
@@ -44,7 +35,22 @@ public class CamTargetLock : MonoBehaviour
         //make the camera look at the target
         mainCamera.transform.LookAt(currentTarget.transform);
     }
-    
+
+    private void DetectTargetsInRange()
+    {
+        //detect enemies in range
+    }
+    private void SwitchTarget(int direction)
+    {
+        currentTargetIndex = (currentTargetIndex + direction) % enemiesInRange.Length;
+
+        if (currentTargetIndex < 0)
+        {
+            currentTargetIndex += enemiesInRange.Length;
+        }
+
+        currentTarget = enemiesInRange[currentTargetIndex];
+    }
     public void SetTargetLock(bool lockOn)
     {
         isTargetLocked = lockOn;
@@ -53,11 +59,24 @@ public class CamTargetLock : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(2))
         {
-            Debug.Log("Mouse 3 was pressed.");
             isTargetLocked = !isTargetLocked;
-            
-            defaultCamera.gameObject.SetActive(!isTargetLocked);;
+
+            defaultCamera.gameObject.SetActive(!isTargetLocked);
             SetTargetLock(isTargetLocked); 
+            
+            //change to detect targets in range
+        }
+
+        if (isTargetLocked && Input.mouseScrollDelta.y != 0f)
+        {
+            SwitchTarget((int)Mathf.Sign(Input.mouseScrollDelta.y));
+        }
+    }
+    private void LateUpdate()
+    {
+        if (isTargetLocked && currentTarget)
+        {
+            FollowTargetLock();
         }
     }
 }

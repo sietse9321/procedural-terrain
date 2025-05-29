@@ -30,6 +30,15 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        MovementByCamera();
+        if (_jump)
+        {
+            _jump.TryJump();
+        }
+    }
+
+    private void MovementByCamera()
+    {
         if (_mainCamera == null) return;
 
         Vector3 cameraForward = _mainCamera.transform.forward;
@@ -51,10 +60,5 @@ public class Player : MonoBehaviour
         }
 
         _movement.Move(inputDir);
-
-        if (_jump)
-        {
-            _jump.TryJump();
-        }
     }
 }
