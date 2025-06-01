@@ -10,27 +10,29 @@ public class MeshGenerator : MonoBehaviour
     [SerializeField] private Vector2Int size;
 
     [Header("Offset Settings")] 
-    [SerializeField] private Vector2 offset;
+    [SerializeField] public Vector2 offset;
 
     [Header("Noise Settings")]
-    [SerializeField] [Range(0.01f, 0.99f)] private float noiseScale = 0.3f;
-    [SerializeField] private float amplitude = 2f;
+    [SerializeField] [Range(0.01f, 0.99f)] private float noiseScale = 0.029f;
+    [SerializeField] private float amplitude = 1.45f;
 
-    // Octaves and Persistence
     [Header("Fractal Noise Settings")]
-    [SerializeField] private int octaves = 4;
-    [SerializeField] [Range(0f, 1f)] private float persistence = 0.5f;
+    [SerializeField] private int octaves = 5;
+    [SerializeField] [Range(0f, 1f)] private float persistence = 0.374f;
     [SerializeField] private float lacunarity = 2f;
 
-    //Power Normalization
     [Header("Height Distribution")]
-    [SerializeField] private float heightPower = 2f; // > 1 creates flatter plains; < 1 creates taller peaks
-
-    // Additional height control for highly varied terrain
+    [SerializeField] private float heightPower = 4.71f;
     [SerializeField] private float heightBias = 0.1f;
+
+    [Header("Random Seed")]
+    [SerializeField] private string seed = "default";
+    [SerializeField] private bool useRandomSeed = false;
 
     Vector3[] vertices;
     Color[] colors;
+
+    private System.Random prng;
 
     private void OnValidate()
     {
@@ -40,6 +42,14 @@ public class MeshGenerator : MonoBehaviour
 
     public void GenerateMesh()
     {
+        if (useRandomSeed)
+        {
+            seed = Time.time.ToString();
+        }
+
+        prng = new System.Random(seed.GetHashCode());
+        offset = new Vector2(prng.Next(-100000, 100000), prng.Next(-100000, 100000));
+
         Mesh mesh = new Mesh();
         mesh.vertices = CreateVertices();
         mesh.triangles = CreateTriangles();
@@ -60,20 +70,14 @@ public class MeshGenerator : MonoBehaviour
         float minHeight = float.MaxValue;
         float maxHeight = float.MinValue;
 
-        // Generate vertices with fractal noise (octaves and persistence)
         for (int i = 0, z = 0; z <= size.y; z++)
         {
             for (int x = 0; x <= size.x; x++)
             {
-                // Calculate fractal noise
                 float height = GenerateFractalNoise(x + offset.x, z + offset.y);
-
-                // Apply height bias and power normalization
                 height = Mathf.Pow(height + heightBias, heightPower);
 
                 vertices[i] = new Vector3(x, height, z);
-
-                // Track min and max height for normalization
                 minHeight = Mathf.Min(minHeight, height);
                 maxHeight = Mathf.Max(maxHeight, height);
 
@@ -81,10 +85,8 @@ public class MeshGenerator : MonoBehaviour
             }
         }
 
-        // Second pass: Normalize heights and assign vertex colors
         for (int i = 0; i < vertices.Length; i++)
         {
-            // Normalize the height range to 0 and 1
             float normalizedHeight = Mathf.InverseLerp(minHeight, maxHeight, vertices[i].y);
             colors[i] = Color.Lerp(Color.black, Color.white, normalizedHeight);
         }
@@ -116,7 +118,6 @@ public class MeshGenerator : MonoBehaviour
         return triangles;
     }
 
-
     private float GenerateFractalNoise(float x, float z)
     {
         float totalNoise = 0f;
@@ -128,12 +129,13 @@ public class MeshGenerator : MonoBehaviour
             float noiseValue = Mathf.PerlinNoise(x * currentFrequency, z * currentFrequency);
             totalNoise += noiseValue * currentAmplitude;
 
-            currentAmplitude *= persistence;  // Reduce amplitude for finer details
-            currentFrequency *= lacunarity;  // Increase frequency for finer details
+            currentAmplitude *= persistence;
+            currentFrequency *= lacunarity;
         }
 
         return totalNoise;
     }
+
     private Vector3[] CalculateNormals(Vector3[] verts)
     {
         Vector3[] normals = new Vector3[verts.Length];
@@ -146,7 +148,6 @@ public class MeshGenerator : MonoBehaviour
             {
                 int index = z * width + x;
 
-                // Get surrounding heights with bounds checking
                 float hL = x > 0 ? verts[z * width + x - 1].y : verts[index].y;
                 float hR = x < width - 1 ? verts[z * width + x + 1].y : verts[index].y;
                 float hD = z > 0 ? verts[(z - 1) * width + x].y : verts[index].y;

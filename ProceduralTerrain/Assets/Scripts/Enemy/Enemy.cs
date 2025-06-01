@@ -29,4 +29,14 @@ public class Enemy : MonoBehaviour
             healthComponent.OnTakeDamage -= HandleDamageTaken;
         }
     }
+    public void DealDamage(int damage)
+    {
+        _health.TakeDamage(damage);
+
+        if (!_health.IsAlive())
+        {
+            Debug.Log($"{gameObject.name} is dead!");
+            Destroy(gameObject);
+        }
+    }
 }

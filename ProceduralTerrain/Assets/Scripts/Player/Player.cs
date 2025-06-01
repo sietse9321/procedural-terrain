@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float moveSpeed = 10f;
     private IPlayerInput _input;
     private IMovement _movement;
+    private IHealth _health;
     private Jump _jump;
     private Rigidbody _rb;
 
@@ -18,6 +19,7 @@ public class Player : MonoBehaviour
     {
         _input = GetComponent<IPlayerInput>();
         _movement = GetComponent<Movement>();
+        _health = GetComponent<IHealth>();
         _jump = GetComponent<Jump>();
         _rb = GetComponent<Rigidbody>();
 
