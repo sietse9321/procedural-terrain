@@ -10,8 +10,13 @@ public class ControllerInput : MonoBehaviour, IPlayerInput
         return new Vector2(horizontal, vertical);
     }
 
-    public bool GetJumpInput()
+    public bool GetTargerLockInput()
     {
-        return Input.GetButtonDown("Jump");
+        throw new System.NotImplementedException();
+    }
+
+    public int GetTargetSwitchInput()
+    {
+        throw new System.NotImplementedException();
     }
 }

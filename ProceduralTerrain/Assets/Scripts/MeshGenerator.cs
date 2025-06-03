@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
@@ -29,6 +28,9 @@ public class MeshGenerator : MonoBehaviour
     [SerializeField] private string seed = "default";
     [SerializeField] private bool useRandomSeed = false;
 
+    [Header("Height Reference")]
+    [SerializeField] public float maximumHeight = 10f; // Set this in inspector or via WorldManager
+
     Vector3[] vertices;
     Color[] colors;
 
@@ -36,7 +38,6 @@ public class MeshGenerator : MonoBehaviour
 
     private void OnValidate()
     {
-        if (Application.isPlaying) return;
         GenerateMesh();
     }
 
@@ -59,6 +60,7 @@ public class MeshGenerator : MonoBehaviour
         mesh.normals = CalculateNormals(vertices);
         meshFilter = GetComponent<MeshFilter>();
         meshFilter.mesh = mesh;
+        meshCollider.sharedMesh = mesh;
         AnalyzeMap();
     }
 
@@ -67,8 +69,8 @@ public class MeshGenerator : MonoBehaviour
         vertices = new Vector3[(size.x + 1) * (size.y + 1)];
         colors = new Color[vertices.Length];
 
-        float minHeight = float.MaxValue;
-        float maxHeight = float.MinValue;
+        float localMinHeight = float.MaxValue;
+        float localMaxHeight = float.MinValue;
 
         for (int i = 0, z = 0; z <= size.y; z++)
         {
@@ -78,16 +80,17 @@ public class MeshGenerator : MonoBehaviour
                 height = Mathf.Pow(height + heightBias, heightPower);
 
                 vertices[i] = new Vector3(x, height, z);
-                minHeight = Mathf.Min(minHeight, height);
-                maxHeight = Mathf.Max(maxHeight, height);
+                localMinHeight = Mathf.Min(localMinHeight, height);
+                localMaxHeight = Mathf.Max(localMaxHeight, height);
 
                 i++;
             }
         }
 
+        // Use the provided maximumHeight for all color normalization across chunks
         for (int i = 0; i < vertices.Length; i++)
         {
-            float normalizedHeight = Mathf.InverseLerp(minHeight, maxHeight, vertices[i].y);
+            float normalizedHeight = Mathf.InverseLerp(0, maximumHeight, vertices[i].y);
             colors[i] = Color.Lerp(Color.black, Color.white, normalizedHeight);
         }
 

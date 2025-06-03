@@ -112,6 +112,7 @@ MonoBehaviour:
   heightBias: 0.07
   seed: default
   useRandomSeed: 0
+  maximumHeight: 10
 --- !u!64 &8453142071705811584
 MeshCollider:
   m_ObjectHideFlags: 0

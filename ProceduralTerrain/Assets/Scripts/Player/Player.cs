@@ -7,7 +7,8 @@ public class Player : MonoBehaviour
     private IPlayerInput _input;
     private IMovement _movement;
     private IHealth _health;
-    private Jump _jump;
+    private CamTargetLock _camTargetLock;
+    //private Jump _jump;
     private Rigidbody _rb;
 
     [SerializeField] private Transform player;
@@ -20,7 +21,8 @@ public class Player : MonoBehaviour
         _input = GetComponent<IPlayerInput>();
         _movement = GetComponent<Movement>();
         _health = GetComponent<IHealth>();
-        _jump = GetComponent<Jump>();
+        _camTargetLock = GetComponent<CamTargetLock>();
+        //_jump = GetComponent<Jump>();
         _rb = GetComponent<Rigidbody>();
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -33,10 +35,27 @@ public class Player : MonoBehaviour
     private void Update()
     {
         MovementByCamera();
-        if (_jump)
+        InputUpdate();
+        // if (_jump)
+        // {
+        //     _jump.TryJump();
+        // }
+    }
+
+    private void InputUpdate()
+    {
+        if (_input.GetTargerLockInput())
         {
-            _jump.TryJump();
+            _camTargetLock.TargetLock();
         }
+
+        // Target switching with input abstraction
+        int switchInput = _input.GetTargetSwitchInput();
+        if (switchInput != 0)
+        {
+            _camTargetLock.SwitchTarget(switchInput);
+        }
+
     }
 
     private void MovementByCamera()

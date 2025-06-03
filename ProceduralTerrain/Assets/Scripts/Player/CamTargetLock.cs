@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cinemachine;
 using UnityEngine;
@@ -14,12 +15,28 @@ public class CamTargetLock : MonoBehaviour
     [SerializeField] float distanceBehindPlayer = 10f;
     [SerializeField] float heightOffset = 1.75f;
     [SerializeField] float followSmoothing = 10f;
-    [SerializeField] float targetLockDistance = 4f;
-    private float detectionRadius = 5f;
+    private float targetLockDistance = 4f;
+    private float detectionRadius = 10f;
 
 
     private bool isTargetLocked = false;
     private int currentTargetIndex = 0;
+    public Enemy[] DetectEnemiesInRadius()
+    {
+        Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius);
+        List<Enemy> foundEnemies = new List<Enemy>();
+
+        foreach (Collider col in colliders)
+        {
+            Enemy enemy = col.GetComponentInParent<Enemy>();
+            if (enemy && !foundEnemies.Contains(enemy))
+            {
+                foundEnemies.Add(enemy);
+            }
+        }
+
+        return foundEnemies.ToArray();
+    }
 
     /// <summary>
     /// Moves the camera to lock onto the target while maintaining its distance from the player.
@@ -38,35 +55,39 @@ public class CamTargetLock : MonoBehaviour
             Vector3.Lerp(mainCamera.transform.position, lockPosition, Time.deltaTime * followSmoothing);
 
         //make the camera look at the target
+        targetCanvas.transform.position = currentTarget.transform.position;
         mainCamera.transform.LookAt(currentTarget.transform);
     }
 
-
-    public Enemy[] DetectEnemiesInRadius()
-    {
-        Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius);
-        List<Enemy> foundEnemies = new List<Enemy>();
-
-        foreach (Collider col in colliders)
-        {
-            Enemy enemy = col.GetComponentInParent<Enemy>();
-            if (enemy && !foundEnemies.Contains(enemy))
-            {
-                foundEnemies.Add(enemy);
-            }
-        }
-
-        return foundEnemies.ToArray();
-    }
-
+    /// <summary>
+    /// Debug Sphere to see how big the range is
+    /// </summary>
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
     }
+    private void SetTargetLock(bool lockOn)
+    {
+        isTargetLocked = lockOn;
+    }
 
+    
+    public void TargetLock()
+    {
+        currentTarget = null;
+        SetTargetLock(isTargetLocked);
 
-    private void SwitchTarget(int direction)
+        if (enemiesInRange.Length == 0)
+            return;
+
+        currentTarget = enemiesInRange[currentTargetIndex];
+        isTargetLocked = !isTargetLocked;
+
+        defaultCamera.gameObject.SetActive(!isTargetLocked);
+        targetCanvas.SetActive(isTargetLocked);
+    }
+    public void SwitchTarget(int direction)
     {
         currentTargetIndex = (currentTargetIndex + direction) % enemiesInRange.Length;
 
@@ -77,30 +98,34 @@ public class CamTargetLock : MonoBehaviour
 
         currentTarget = enemiesInRange[currentTargetIndex];
     }
-
-    public void SetTargetLock(bool lockOn)
+    
+    public void CheckTargetLock()
     {
-        isTargetLocked = lockOn;
+        if (currentTarget == null || Array.IndexOf(enemiesInRange, currentTarget) == -1)
+        {
+            if (enemiesInRange.Length > 0)
+            {
+                currentTargetIndex = 0; 
+                currentTarget = enemiesInRange[currentTargetIndex];
+            }
+            else
+            {
+                isTargetLocked = false;
+                defaultCamera.gameObject.SetActive(true);
+                targetCanvas.SetActive(false);
+            }
+        }
     }
 
+    private void FixedUpdate()
+    {
+        enemiesInRange = DetectEnemiesInRadius();
+    }
+    
     void Update()
     {
-        if (Input.GetMouseButtonDown(2))
-        {
-            //make constant detection (fixed update)
-            //check if there are no targets in range (error exception)
-            enemiesInRange = DetectEnemiesInRadius();
-            currentTarget = enemiesInRange[currentTargetIndex];
-            isTargetLocked = !isTargetLocked;
-
-            defaultCamera.gameObject.SetActive(!isTargetLocked);
-            SetTargetLock(isTargetLocked);
-        }
-
-        if (isTargetLocked && Input.mouseScrollDelta.y != 0f)
-        {
-            SwitchTarget((int)Mathf.Sign(Input.mouseScrollDelta.y));
-        }
+        if (!isTargetLocked) return;
+        CheckTargetLock();
     }
 
     private void LateUpdate()
