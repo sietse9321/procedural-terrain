@@ -9,10 +9,10 @@ public interface IHealth
     int MaxHealth { get; set; }
 
     // Method to apply damage to the entity
-    void TakeDamage(int damageAmount);
+    void TakeDamage(int pDamage);
 
     // Method to heal the entity
-    void Heal(int healAmount);
+    void Heal(int pHeal);
 
     // Check if the entity is still alive
     bool IsAlive();

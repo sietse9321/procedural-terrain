@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 3188240261394818541}
   - component: {fileID: 7026797536743543669}
   - component: {fileID: 1542692829454309305}
-  - component: {fileID: 3564528216579303718}
   m_Layer: 0
   m_Name: Terrain Mesh
   m_TagString: Untagged
@@ -110,9 +109,39 @@ MonoBehaviour:
   lacunarity: 2
   heightPower: 4.71
   heightBias: 0.07
-  seed: 1
-  useRandomSeed: 0
+  seed: 
+  useRandomSeed: 1
   maximumHeight: 20
+  gradient:
+    serializedVersion: 2
+    key0: {r: 0, g: 0.10980392, b: 0.99215686, a: 1}
+    key1: {r: 0, g: 0.30588236, b: 1, a: 1}
+    key2: {r: 0.8584906, g: 0.8541914, b: 0.24701849, a: 0}
+    key3: {r: 0.12106911, g: 0.41509432, b: 0, a: 0}
+    key4: {r: 0.2924528, g: 0.2662424, b: 0.2662424, a: 0}
+    key5: {r: 1, g: 1, b: 1, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 1928
+    ctime1: 3277
+    ctime2: 5243
+    ctime3: 12722
+    ctime4: 62644
+    ctime5: 65535
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 1
+    m_ColorSpace: -1
+    m_NumColorKeys: 6
+    m_NumAlphaKeys: 2
 --- !u!64 &1542692829454309305
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -135,15 +164,3 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
---- !u!114 &3564528216579303718
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7280077633105715230}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5478938b39cf49388b65bdc3becb4e75, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

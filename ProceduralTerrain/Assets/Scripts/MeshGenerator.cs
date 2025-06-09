@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(MeshFilter))]
 public class MeshGenerator : MonoBehaviour
@@ -6,7 +7,7 @@ public class MeshGenerator : MonoBehaviour
     [SerializeField] private bool drawGizmos;
     [SerializeField] MeshFilter meshFilter;
     [SerializeField] MeshCollider meshCollider;
-    [SerializeField] private Vector2Int size;
+    [SerializeField] public Vector2Int size;
 
     [Header("Offset Settings")] 
     [SerializeField] public Vector2 offset;
@@ -25,32 +26,26 @@ public class MeshGenerator : MonoBehaviour
     [SerializeField] private float heightBias = 0.1f;
 
     [Header("Random Seed")]
-    [SerializeField] private string seed = "default";
-    [SerializeField] private bool useRandomSeed = false;
+    [SerializeField] public string seed = "default";
+    [SerializeField] public bool useRandomSeed = false;
 
     [Header("Height Reference")]
     [SerializeField] public float maximumHeight = 10f; // Set this in inspector or via WorldManager
+    [SerializeField] Gradient gradient;
 
     Vector3[] vertices;
     Color[] colors;
 
     private System.Random prng;
 
-    private void OnValidate()
+    //switch to OnValidate for debug 
+    private void Awake()
     {
         GenerateMesh();
     }
 
     public void GenerateMesh()
     {
-        if (useRandomSeed)
-        {
-            seed = Time.time.ToString();
-        }
-
-        prng = new System.Random(seed.GetHashCode());
-        offset = new Vector2(prng.Next(-100000, 100000), prng.Next(-100000, 100000));
-
         Mesh mesh = new Mesh();
         mesh.vertices = CreateVertices();
         mesh.triangles = CreateTriangles();
@@ -91,7 +86,7 @@ public class MeshGenerator : MonoBehaviour
         for (int i = 0; i < vertices.Length; i++)
         {
             float normalizedHeight = Mathf.InverseLerp(0, maximumHeight, vertices[i].y);
-            colors[i] = Color.Lerp(Color.black, Color.white, normalizedHeight);
+            colors[i] = gradient.Evaluate(normalizedHeight);
         }
 
         return vertices;

@@ -15,8 +15,8 @@ public class CamTargetLock : MonoBehaviour
     [SerializeField] float distanceBehindPlayer = 10f;
     [SerializeField] float heightOffset = 1.75f;
     [SerializeField] float followSmoothing = 10f;
-    private float targetLockDistance = 4f;
-    private float detectionRadius = 10f;
+    private const float targetLockDistance = 4f;
+    private const float detectionRadius = 10f;
 
 
     private bool isTargetLocked = false;
