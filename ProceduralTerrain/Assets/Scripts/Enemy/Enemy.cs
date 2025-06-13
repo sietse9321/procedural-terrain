@@ -11,32 +11,26 @@ public class Enemy : MonoBehaviour
         
         if (_health is Health healthComponent)
         {
-            healthComponent.OnTakeDamage += HandleDamageTaken;
+            healthComponent.OnTakeDamage += DamageEffect;
+            healthComponent.OnDeath += HandleDeath;
         }
     }
 
-    private void HandleDamageTaken(int damageAmount)
+    private void DamageEffect(int damageAmount)
     {
-        Debug.Log($"Enemy {gameObject.name} took {damageAmount} damage!");
+        Debug.Log($"Enemy {gameObject.name} took {damageAmount} damage");
 
-        //add effect/shader effect (for damage)
+        //add damage effect here
     }
 
-    private void OnDestroy()
+    private void HandleDeath()
     {
+        Debug.Log($"{gameObject.name} has died");
         if (_health is Health healthComponent)
         {
-            healthComponent.OnTakeDamage -= HandleDamageTaken;
+            healthComponent.OnTakeDamage -= DamageEffect;
+            healthComponent.OnDeath -= HandleDeath;
         }
-    }
-    public void DealDamage(int damage)
-    {
-        _health.TakeDamage(damage);
-
-        if (!_health.IsAlive())
-        {
-            Debug.Log($"{gameObject.name} is dead!");
-            Destroy(gameObject);
-        }
+        Destroy(gameObject);
     }
 }

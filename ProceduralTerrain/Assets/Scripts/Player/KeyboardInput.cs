@@ -10,6 +10,11 @@ public class KeyboardInput : MonoBehaviour, IPlayerInput
         return new Vector2(horizontal, vertical);
     }
 
+    public bool GetAttackInput()
+    {
+        return Input.GetMouseButtonDown(0);
+    }
+
     public bool GetTargerLockInput()
     {
         return Input.GetMouseButtonDown(2);

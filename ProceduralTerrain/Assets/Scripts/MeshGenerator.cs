@@ -1,4 +1,6 @@
+using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UIElements;
 
 [RequireComponent(typeof(MeshFilter))]
@@ -57,6 +59,8 @@ public class MeshGenerator : MonoBehaviour
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
         AnalyzeMap();
+        NavMeshSurface navMesh = GetComponent<NavMeshSurface>();
+        navMesh.BuildNavMesh();
     }
 
     private Vector3[] CreateVertices()

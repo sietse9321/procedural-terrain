@@ -1,15 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Sword : MonoBehaviour
-{ 
+{
     private void OnTriggerEnter(Collider other)
     {
-        // Try to get a component that implements IHealth
-        IHealth targetHealth = other.GetComponent<IHealth>();
+        IHittable[] hittables = other.GetComponents<IHittable>();
+        foreach (var hittable in hittables)
+        {
+            hittable.OnHit();
+        }
         
-        targetHealth?.TakeDamage(10);
+        if (other.TryGetComponent(out IHealth health))
+        {
+            health.TakeDamage(10);
+        }
     }
-
 }
