@@ -14,8 +14,20 @@ public class ChunkManager : MonoBehaviour
     private void Start()
     {
         worldSeed = GameManager.Instance.seed;
-        if (worldSeed == "") worldSeed = System.DateTime.Now.Ticks.ToString();
-
+        Debug.Log(worldSeed);
+        if (worldSeed == "") 
+        {
+            worldSeed = System.DateTime.Now.Ticks.ToString();
+        }
+        else
+        {
+            worldSeed = worldSeed.Replace(" ", "");
+            if (worldSeed.Length > 18)
+            {
+                worldSeed = worldSeed.Substring(0, 18);
+            }
+        }
+        
         var prng = new System.Random(worldSeed.GetHashCode());
         float randomOffsetX = prng.Next(-100000, 100000);
         float randomOffsetY = prng.Next(-100000, 100000);

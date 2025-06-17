@@ -10,6 +10,11 @@ public class ControllerInput : MonoBehaviour, IPlayerInput
         return new Vector2(horizontal, vertical);
     }
 
+    public bool GetAttackInput()
+    {
+        throw new System.NotImplementedException();
+    }
+
     public bool GetTargerLockInput()
     {
         throw new System.NotImplementedException();

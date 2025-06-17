@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    private IAttackCombo _attackCombo;
     [SerializeField] private float rotationSpeed = 10f;
     [SerializeField] private float moveSpeed = 10f;
     private IPlayerInput _input;
@@ -24,6 +25,7 @@ public class Player : MonoBehaviour
         _camTargetLock = GetComponent<CamTargetLock>();
         //_jump = GetComponent<Jump>();
         _rb = GetComponent<Rigidbody>();
+        _attackCombo = GetComponent<IAttackCombo>();
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -36,10 +38,6 @@ public class Player : MonoBehaviour
     {
         MovementByCamera();
         InputUpdate();
-        // if (_jump)
-        // {
-        //     _jump.TryJump();
-        // }
     }
 
     private void InputUpdate()
@@ -56,6 +54,10 @@ public class Player : MonoBehaviour
             _camTargetLock.SwitchTarget(switchInput);
         }
 
+        if (_input.GetAttackInput())
+        {
+            _attackCombo?.Attack();
+        }
     }
 
     private void MovementByCamera()

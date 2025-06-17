@@ -59,8 +59,8 @@ public class MeshGenerator : MonoBehaviour
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
         AnalyzeMap();
-        NavMeshSurface navMesh = GetComponent<NavMeshSurface>();
-        navMesh.BuildNavMesh();
+        //NavMeshSurface navMesh = GetComponent<NavMeshSurface>();
+        //navMesh.BuildNavMesh();
     }
 
     private Vector3[] CreateVertices()

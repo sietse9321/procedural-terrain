@@ -9,10 +9,12 @@ public class GameManager : MonoBehaviour
 {
     private static GameManager instance;
     public static GameManager Instance => instance;
+    public TMP_InputField seedInput;
+    public string seed;
 
-    public string seed = null;
-    
-    
+    bool loading;
+
+
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -25,9 +27,30 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    private void Update()
+    {
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            seedInput = FindObjectOfType<TMP_InputField>();
+            seed = seedInput.text;
+        }
+        
+    }
+
     public void GameStart(TMP_InputField pSeed)
     {
-        seed = pSeed.text;
-        SceneManager.LoadSceneAsync("SampleScene");
+        //seed = pSeed.text;
+        //Debug.Log(seed);
+        SceneManager.LoadSceneAsync("MapShowCase");
+    }
+
+    public void LoadMenu()
+    {
+        SceneManager.LoadSceneAsync("MenuScene");
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 }
