@@ -8,5 +8,7 @@ public interface IPlayerInput
     
     bool GetTargerLockInput();
     
+    bool GetDashInput();
+    
     int GetTargetSwitchInput();
 }

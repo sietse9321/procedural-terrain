@@ -20,6 +20,11 @@ public class KeyboardInput : MonoBehaviour, IPlayerInput
         return Input.GetMouseButtonDown(2);
     }
 
+    public bool GetDashInput()
+    {
+        return Input.GetKeyDown(KeyCode.LeftShift);
+    }
+
     public int GetTargetSwitchInput()
     {
         if (Input.mouseScrollDelta.y != 0f)

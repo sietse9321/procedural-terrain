@@ -2,24 +2,28 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    private IAttackCombo _attackCombo;
     [SerializeField] private float rotationSpeed = 10f;
     [SerializeField] private float moveSpeed = 10f;
+    [SerializeField] private Transform player;
+    [SerializeField] private Transform playerObj;
     private IPlayerInput _input;
+    private IAttackCombo _attackCombo;
     private IMovement _movement;
+    private IDashable _dash;
     private IHealth _health;
+
     private CamTargetLock _camTargetLock;
+
     //private Jump _jump;
     private Rigidbody _rb;
 
-    [SerializeField] private Transform player;
-    [SerializeField] private Transform playerObj;
 
     private Camera _mainCamera;
 
     private void Awake()
     {
         _input = GetComponent<IPlayerInput>();
+        _dash = GetComponent<IDashable>();
         _movement = GetComponent<Movement>();
         _health = GetComponent<IHealth>();
         _camTargetLock = GetComponent<CamTargetLock>();
@@ -45,6 +49,16 @@ public class Player : MonoBehaviour
         if (_input.GetTargerLockInput())
         {
             _camTargetLock.TargetLock();
+        }
+
+        if (_input.GetDashInput() && _camTargetLock.IsTargetLocked)
+        {
+            Vector3 toTarget = (_camTargetLock.CurrentTarget.transform.position - playerObj.position).normalized;
+            _dash.DashDirection(toTarget);
+        }
+        else if (_input.GetDashInput() && !_camTargetLock.CurrentTarget)
+        {
+            _dash.DashDirection(playerObj.forward);
         }
 
         // Target switching with input abstraction

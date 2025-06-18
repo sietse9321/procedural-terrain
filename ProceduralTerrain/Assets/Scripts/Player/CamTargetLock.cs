@@ -8,18 +8,18 @@ public class CamTargetLock : MonoBehaviour
 {
     [SerializeField] Transform player;
     [SerializeField] GameObject targetCanvas;
-    [SerializeField] Enemy currentTarget;
     [SerializeField] Enemy[] enemiesInRange;
     [SerializeField] Camera mainCamera;
     [SerializeField] CinemachineFreeLook defaultCamera;
     [SerializeField] float distanceBehindPlayer = 10f;
     [SerializeField] float heightOffset = 1.75f;
-    [SerializeField] float followSmoothing = 10f;
+    [SerializeField] float followSmoothing = 1f;
     private const float targetLockDistance = 4f;
     private const float detectionRadius = 10f;
 
 
-    private bool isTargetLocked = false;
+    public Enemy CurrentTarget { get; private set; }
+    public bool IsTargetLocked {get; private set;}
     private int currentTargetIndex = 0;
     public Enemy[] DetectEnemiesInRadius()
     {
@@ -44,7 +44,7 @@ public class CamTargetLock : MonoBehaviour
     private void FollowTargetLock()
     {
         //calculate a position relative to the midpoint between the player and target
-        Vector3 directionToTarget = (currentTarget.transform.position - player.position).normalized;
+        Vector3 directionToTarget = (CurrentTarget.transform.position - player.position).normalized;
         Vector3 lockPosition = player.position - directionToTarget * targetLockDistance;
 
         //maintain height offset for clarity
@@ -55,8 +55,8 @@ public class CamTargetLock : MonoBehaviour
             Vector3.Lerp(mainCamera.transform.position, lockPosition, Time.deltaTime * followSmoothing);
 
         //make the camera look at the target
-        targetCanvas.transform.position = currentTarget.transform.position;
-        mainCamera.transform.LookAt(currentTarget.transform);
+        targetCanvas.transform.position = CurrentTarget.transform.position;
+        mainCamera.transform.LookAt(CurrentTarget.transform);
     }
 
     /// <summary>
@@ -69,23 +69,23 @@ public class CamTargetLock : MonoBehaviour
     }
     private void SetTargetLock(bool lockOn)
     {
-        isTargetLocked = lockOn;
+        IsTargetLocked = lockOn;
     }
 
     
     public void TargetLock()
     {
-        currentTarget = null;
-        SetTargetLock(isTargetLocked);
+        CurrentTarget = null;
+        SetTargetLock(IsTargetLocked);
 
         if (enemiesInRange.Length == 0)
             return;
 
-        currentTarget = enemiesInRange[currentTargetIndex];
-        isTargetLocked = !isTargetLocked;
+        CurrentTarget = enemiesInRange[currentTargetIndex];
+        IsTargetLocked = !IsTargetLocked;
 
-        defaultCamera.gameObject.SetActive(!isTargetLocked);
-        targetCanvas.SetActive(isTargetLocked);
+        defaultCamera.gameObject.SetActive(!IsTargetLocked);
+        targetCanvas.SetActive(IsTargetLocked);
     }
     public void SwitchTarget(int direction)
     {
@@ -96,21 +96,21 @@ public class CamTargetLock : MonoBehaviour
             currentTargetIndex += enemiesInRange.Length;
         }
 
-        currentTarget = enemiesInRange[currentTargetIndex];
+        CurrentTarget = enemiesInRange[currentTargetIndex];
     }
     
     public void CheckTargetLock()
     {
-        if (currentTarget == null || Array.IndexOf(enemiesInRange, currentTarget) == -1)
+        if (CurrentTarget == null || Array.IndexOf(enemiesInRange, CurrentTarget) == -1)
         {
             if (enemiesInRange.Length > 0)
             {
                 currentTargetIndex = 0; 
-                currentTarget = enemiesInRange[currentTargetIndex];
+                CurrentTarget = enemiesInRange[currentTargetIndex];
             }
             else
             {
-                isTargetLocked = false;
+                IsTargetLocked = false;
                 defaultCamera.gameObject.SetActive(true);
                 targetCanvas.SetActive(false);
             }
@@ -124,13 +124,13 @@ public class CamTargetLock : MonoBehaviour
     
     void Update()
     {
-        if (!isTargetLocked) return;
+        if (!IsTargetLocked) return;
         CheckTargetLock();
     }
 
     private void LateUpdate()
     {
-        if (isTargetLocked && currentTarget)
+        if (IsTargetLocked && CurrentTarget)
         {
             FollowTargetLock();
         }

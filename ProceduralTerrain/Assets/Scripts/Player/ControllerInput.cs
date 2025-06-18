@@ -20,6 +20,11 @@ public class ControllerInput : MonoBehaviour, IPlayerInput
         throw new System.NotImplementedException();
     }
 
+    public bool GetDashInput()
+    {
+        throw new System.NotImplementedException();
+    }
+
     public int GetTargetSwitchInput()
     {
         throw new System.NotImplementedException();
