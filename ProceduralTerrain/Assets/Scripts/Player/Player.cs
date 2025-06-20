@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class Player : MonoBehaviour
 {
@@ -51,26 +52,24 @@ public class Player : MonoBehaviour
             _camTargetLock.TargetLock();
         }
 
-        if (_input.GetDashInput() && _camTargetLock.IsTargetLocked)
+       
+        if (_input.GetDashInput() && !_camTargetLock.IsTargetLocked)
         {
-            Vector3 toTarget = (_camTargetLock.CurrentTarget.transform.position - playerObj.position).normalized;
-            _dash.DashDirection(toTarget);
-        }
-        else if (_input.GetDashInput() && !_camTargetLock.CurrentTarget)
-        {
-            _dash.DashDirection(playerObj.forward);
+            _dash?.DashDirection(playerObj.forward);
         }
 
         // Target switching with input abstraction
         int switchInput = _input.GetTargetSwitchInput();
         if (switchInput != 0)
         {
-            _camTargetLock.SwitchTarget(switchInput);
+            _camTargetLock?.SwitchTarget(switchInput);
         }
 
         if (_input.GetAttackInput())
         {
             _attackCombo?.Attack();
+            Vector3 toTarget = (_camTargetLock.CurrentTarget.transform.position - playerObj.position).normalized;
+            _dash?.DashDirection(toTarget);
         }
     }
 

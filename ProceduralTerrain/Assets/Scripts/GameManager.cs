@@ -37,11 +37,9 @@ public class GameManager : MonoBehaviour
         
     }
 
-    public void GameStart(TMP_InputField pSeed)
+    public void GameStart()
     {
-        //seed = pSeed.text;
-        //Debug.Log(seed);
-        SceneManager.LoadSceneAsync("MapShowCase");
+        SceneManager.LoadSceneAsync("SampleScene");
     }
 
     public void LoadMenu()

@@ -4,8 +4,8 @@ using System.Collections;
 [RequireComponent(typeof(Rigidbody))]
 public class Dash : MonoBehaviour, IDashable
 {
-    [SerializeField] private float dashDistance = 8f;
-    [SerializeField] private float dashDuration = 0.2f;
+    [SerializeField] private float dashDistance = 2f;
+    [SerializeField] private float dashDuration = 0.05f;
     [SerializeField] private float cooldown = 1f;
 
     public bool IsDashing { get; private set; }
