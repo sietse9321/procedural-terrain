@@ -1,10 +1,11 @@
+using Unity.AI.Navigation;
 using UnityEngine;
 
 public class ChunkManager : MonoBehaviour
 {
     [SerializeField] MeshGenerator meshPrefab;
-    [SerializeField] int chunksX = 4;
-    [SerializeField] int chunksY = 4;
+    [SerializeField] int chunksX;
+    [SerializeField] int chunksY;
     [SerializeField] Vector2Int chunkSize = new Vector2Int(16, 16);
 
     [Header("World Seed")]
@@ -54,5 +55,7 @@ public class ChunkManager : MonoBehaviour
             }
         }
         worldOffset = baseRandomOffset;
+        NavMeshSurface navMesh = GetComponent<NavMeshSurface>();
+        navMesh.BuildNavMesh();
     }
 }

@@ -52,7 +52,7 @@ public class Player : MonoBehaviour
             _camTargetLock.TargetLock();
         }
 
-       
+
         if (_input.GetDashInput() && !_camTargetLock.IsTargetLocked)
         {
             _dash?.DashDirection(playerObj.forward);
@@ -68,8 +68,11 @@ public class Player : MonoBehaviour
         if (_input.GetAttackInput())
         {
             _attackCombo?.Attack();
-            Vector3 toTarget = (_camTargetLock.CurrentTarget.transform.position - playerObj.position).normalized;
-            _dash?.DashDirection(toTarget);
+            if (_camTargetLock.IsTargetLocked)
+            {
+                Vector3 toTarget = (_camTargetLock.CurrentTarget.transform.position - playerObj.position).normalized;
+                _dash?.DashDirection(toTarget);
+            }
         }
     }
 

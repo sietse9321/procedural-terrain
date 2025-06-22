@@ -9,6 +9,9 @@ public class GameManager : MonoBehaviour
 {
     private static GameManager instance;
     public static GameManager Instance => instance;
+
+    private event Action OnPlayerDeath;
+    public Player player;
     public TMP_InputField seedInput;
     public string seed;
 
@@ -34,7 +37,11 @@ public class GameManager : MonoBehaviour
             seedInput = FindObjectOfType<TMP_InputField>();
             seed = seedInput.text;
         }
-        
+
+        if (SceneManager.GetActiveScene().buildIndex == 1 && player == null)
+        {
+            player = FindObjectOfType<Player>();
+        }
     }
 
     public void GameStart()

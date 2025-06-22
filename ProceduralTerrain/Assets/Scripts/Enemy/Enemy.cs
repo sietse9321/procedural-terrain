@@ -15,6 +15,11 @@ public class Enemy : MonoBehaviour
             healthComponent.OnTakeDamage += DamageEffect;
             healthComponent.OnDeath += HandleDeath;
         }
+        if (_health is ArmouredHealth aHealthComponent)
+        {
+            aHealthComponent.OnTakeDamage += DamageEffect;
+            aHealthComponent.OnDeath += HandleDeath;
+        }
     }
 
     private void DamageEffect(int damageAmount)
@@ -22,6 +27,7 @@ public class Enemy : MonoBehaviour
         Debug.Log($"Enemy {gameObject.name} took {damageAmount} damage");
 
         //add damage effect here
+        //damage number effect
     }
 
     private void HandleDeath()
@@ -31,6 +37,11 @@ public class Enemy : MonoBehaviour
         {
             healthComponent.OnTakeDamage -= DamageEffect;
             healthComponent.OnDeath -= HandleDeath;
+        }
+        if (_health is ArmouredHealth aHealthComponent)
+        {
+            aHealthComponent.OnTakeDamage -= DamageEffect;
+            aHealthComponent.OnDeath -= HandleDeath;
         }
         Destroy(gameObject);
     }
