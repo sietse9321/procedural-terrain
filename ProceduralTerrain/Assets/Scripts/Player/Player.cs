@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 public class Player : MonoBehaviour
 {
@@ -58,7 +57,6 @@ public class Player : MonoBehaviour
             _dash?.DashDirection(playerObj.forward);
         }
 
-        // Target switching with input abstraction
         int switchInput = _input.GetTargetSwitchInput();
         if (switchInput != 0)
         {

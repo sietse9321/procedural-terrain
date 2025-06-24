@@ -3,7 +3,7 @@ using System;
 
 public class Health : MonoBehaviour, IHealth
 {
-    [SerializeField] private int maxHealth = 100;
+    [SerializeField] private int maxHealth;
     private int currentHealth;
 
     public event Action<int> OnTakeDamage;

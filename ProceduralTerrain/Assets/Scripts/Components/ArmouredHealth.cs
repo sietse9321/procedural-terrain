@@ -3,7 +3,7 @@ using System;
 
 public class ArmouredHealth : MonoBehaviour, IHealth
 {
-    [SerializeField] private int maxHealth = 200;
+    [SerializeField] private int maxHealth;
     private int currentHealth;
 
     public event Action<int> OnTakeDamage;
@@ -26,9 +26,12 @@ public class ArmouredHealth : MonoBehaviour, IHealth
     {
         if (pDamage <= 0 || currentHealth <= 0) return;
 
-        currentHealth -= pDamage;
-        OnTakeDamage?.Invoke(pDamage);
-        Debug.Log($"{gameObject.name} took {pDamage} damage. Remaining health: {currentHealth}");
+        // Take only 80% of the incoming damage
+        int reducedDamage = Mathf.CeilToInt(pDamage * 0.8f);
+
+        currentHealth -= reducedDamage;
+        OnTakeDamage?.Invoke(reducedDamage);
+        Debug.Log($"{gameObject.name} took {reducedDamage} damage. Remaining health: {currentHealth}");
 
         if (currentHealth <= 0)
         {
@@ -36,9 +39,10 @@ public class ArmouredHealth : MonoBehaviour, IHealth
         }
     }
 
+
     public void Heal(int pHeal)
     {
-        if (pHeal <= 0 || currentHealth == maxHealth) return;
+        if (pHeal <= 0 || currentHealth == MaxHealth) return;
 
         currentHealth += pHeal;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);

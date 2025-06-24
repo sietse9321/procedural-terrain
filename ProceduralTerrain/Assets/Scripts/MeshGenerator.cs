@@ -59,6 +59,10 @@ public class MeshGenerator : MonoBehaviour
         AnalyzeMap();
     }
 
+    /// <summary>
+    /// Creates a mesh with noise heightmap
+    /// </summary>
+    /// <returns></returns>
     private Vector3[] CreateVertices()
     {
         vertices = new Vector3[(size.x + 1) * (size.y + 1)];

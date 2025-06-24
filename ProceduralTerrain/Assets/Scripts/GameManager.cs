@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,14 +6,11 @@ public class GameManager : MonoBehaviour
 {
     private static GameManager instance;
     public static GameManager Instance => instance;
-
-    private event Action OnPlayerDeath;
+    
     public Player player;
     public TMP_InputField seedInput;
     public string seed;
-
-    bool loading;
-
+    
 
     private void Awake()
     {
@@ -41,8 +35,26 @@ public class GameManager : MonoBehaviour
         if (SceneManager.GetActiveScene().buildIndex == 1 && player == null)
         {
             player = FindObjectOfType<Player>();
+            IHealth health = player.GetComponent<IHealth>();
+            if (health != null)
+            {
+                if (health is Health h)
+                    h.OnDeath += OnPlayerDeath;
+                else if (health is ArmouredHealth ah)
+                    ah.OnDeath += OnPlayerDeath;
+            }
+
         }
     }
+    private void OnPlayerDeath()
+    {
+        Debug.Log("Game Over: Player is dead!");
+        // Handle game over logic here (UI, scene, etc.)
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    
 
     public void GameStart()
     {

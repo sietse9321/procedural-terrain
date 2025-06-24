@@ -51,8 +51,7 @@ public class CamTargetLock : MonoBehaviour
         lockPosition.y = player.position.y + heightOffset;
 
         //smoothly move the camera to this position
-        mainCamera.transform.position =
-            Vector3.Lerp(mainCamera.transform.position, lockPosition, Time.deltaTime * followSmoothing);
+        mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, lockPosition, Time.deltaTime * followSmoothing);
 
         //make the camera look at the target
         targetCanvas.transform.position = CurrentTarget.transform.position;

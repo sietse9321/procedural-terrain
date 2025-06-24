@@ -1,8 +1,7 @@
-using System;
 using UnityEngine;
 
 [RequireComponent(typeof(IHealth))]
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour //add ITargetable interface
 {
     private IHealth _health;
 
@@ -20,6 +19,8 @@ public class Enemy : MonoBehaviour
             aHealthComponent.OnTakeDamage += DamageEffect;
             aHealthComponent.OnDeath += HandleDeath;
         }
+
+        _health.MaxHealth = 100;
     }
 
     private void DamageEffect(int damageAmount)
