@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private Transform player;
     [SerializeField] private Transform playerObj;
+    private InputSwitcher _inputSwitcher;
     private IPlayerInput _input;
     private IAttackCombo _attackCombo;
     private IMovement _movement;
@@ -22,12 +23,12 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        _input = GetComponent<IPlayerInput>();
+        _inputSwitcher = GetComponent<InputSwitcher>();
+        _input = _inputSwitcher.ActiveInput;
         _dash = GetComponent<IDashable>();
         _movement = GetComponent<Movement>();
         _health = GetComponent<IHealth>();
         _camTargetLock = GetComponent<CamTargetLock>();
-        //_jump = GetComponent<Jump>();
         _rb = GetComponent<Rigidbody>();
         _attackCombo = GetComponent<IAttackCombo>();
 
@@ -40,17 +41,18 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        MovementByCamera();
         InputUpdate();
+        MovementByCamera();
     }
 
     private void InputUpdate()
     {
+        _input = _inputSwitcher.ActiveInput;
+
         if (_input.GetTargerLockInput())
         {
             _camTargetLock.TargetLock();
         }
-
 
         if (_input.GetDashInput() && !_camTargetLock.IsTargetLocked)
         {
@@ -58,7 +60,7 @@ public class Player : MonoBehaviour
         }
 
         int switchInput = _input.GetTargetSwitchInput();
-        if (switchInput != 0)
+        if (switchInput != 0 && _camTargetLock.IsTargetLocked)
         {
             _camTargetLock?.SwitchTarget(switchInput);
         }
@@ -68,7 +70,7 @@ public class Player : MonoBehaviour
             _attackCombo?.Attack();
             if (_camTargetLock.IsTargetLocked)
             {
-                Vector3 toTarget = (_camTargetLock.CurrentTarget.transform.position - playerObj.position).normalized;
+                Vector3 toTarget = (_camTargetLock.CurrentTarget.TargetTransform.position - playerObj.position).normalized;
                 _dash?.DashDirection(toTarget);
             }
         }

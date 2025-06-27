@@ -2,61 +2,57 @@ using System;
 using System.Collections.Generic;
 using Cinemachine;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class CamTargetLock : MonoBehaviour
 {
     [SerializeField] Transform player;
     [SerializeField] GameObject targetCanvas;
-    [SerializeField] Enemy[] enemiesInRange;
     [SerializeField] Camera mainCamera;
     [SerializeField] CinemachineFreeLook defaultCamera;
     [SerializeField] float distanceBehindPlayer = 10f;
     [SerializeField] float heightOffset = 1.75f;
-    [SerializeField] float followSmoothing = 1f;
-    private const float targetLockDistance = 4f;
-    private const float detectionRadius = 10f;
+    [SerializeField] float followSmoothing = 0.1f;
+    private float _switchTargetCooldown = 0.2f;
+    private float _lastSwitchTime = -999f;
+    private const float TargetLockDistance = 4f;
+    private const float DetectionRadius = 10f;
 
+    public ITargetable CurrentTarget { get; private set; }
+    public bool IsTargetLocked { get; private set; }
+    private int currentTargetIndex;
+    ITargetable[] targetsInRange;
+    
 
-    public Enemy CurrentTarget { get; private set; }
-    public bool IsTargetLocked {get; private set;}
-    private int currentTargetIndex = 0;
-    public Enemy[] DetectEnemiesInRadius()
+    public ITargetable[] DetectTargetsInRadius()
     {
-        Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius);
-        List<Enemy> foundEnemies = new List<Enemy>();
+        Collider[] colliders = Physics.OverlapSphere(transform.position, DetectionRadius);
+        List<ITargetable> foundTargets = new List<ITargetable>();
 
         foreach (Collider col in colliders)
         {
-            Enemy enemy = col.GetComponentInParent<Enemy>();
-            if (enemy && !foundEnemies.Contains(enemy))
+            ITargetable target = col.GetComponentInParent<ITargetable>();
+            if (target != null && !foundTargets.Contains(target))
             {
-                foundEnemies.Add(enemy);
+                foundTargets.Add(target);
             }
         }
 
-        return foundEnemies.ToArray();
+        return foundTargets.ToArray();
     }
 
-    /// <summary>
-    /// Moves the camera to lock onto the target while maintaining its distance from the player.
-    /// </summary>
     private void FollowTargetLock()
     {
-        //calculate a position relative to the midpoint between the player and target
-        Vector3 directionToTarget = (CurrentTarget.transform.position - player.position).normalized;
-        Vector3 lockPosition = player.position - directionToTarget * targetLockDistance;
-
-        //maintain height offset for clarity
+        Vector3 directionToTarget = (CurrentTarget.TargetTransform.position - player.position).normalized;
+        Vector3 lockPosition = player.position - directionToTarget * TargetLockDistance;
         lockPosition.y = player.position.y + heightOffset;
+        mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, lockPosition, Time.deltaTime * followSmoothing *2);
 
-        //smoothly move the camera to this position
-        mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, lockPosition, Time.deltaTime * followSmoothing);
+        targetCanvas.transform.position = CurrentTarget.TargetTransform.position;
 
-        //make the camera look at the target
-        targetCanvas.transform.position = CurrentTarget.transform.position;
-        mainCamera.transform.LookAt(CurrentTarget.transform);
+        Quaternion targetRotation = Quaternion.LookRotation(CurrentTarget.TargetTransform.position - mainCamera.transform.position);
+        mainCamera.transform.rotation = Quaternion.Slerp(mainCamera.transform.rotation, targetRotation, Time.deltaTime * followSmoothing);
     }
+
 
     /// <summary>
     /// Debug Sphere to see how big the range is
@@ -64,7 +60,7 @@ public class CamTargetLock : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        Gizmos.DrawWireSphere(transform.position, DetectionRadius);
     }
     private void SetTargetLock(bool lockOn)
     {
@@ -77,10 +73,10 @@ public class CamTargetLock : MonoBehaviour
         CurrentTarget = null;
         SetTargetLock(IsTargetLocked);
 
-        if (enemiesInRange.Length == 0)
+        if (targetsInRange.Length == 0)
             return;
 
-        CurrentTarget = enemiesInRange[currentTargetIndex];
+        CurrentTarget = targetsInRange[currentTargetIndex];
         IsTargetLocked = !IsTargetLocked;
 
         defaultCamera.gameObject.SetActive(!IsTargetLocked);
@@ -88,24 +84,30 @@ public class CamTargetLock : MonoBehaviour
     }
     public void SwitchTarget(int direction)
     {
-        currentTargetIndex = (currentTargetIndex + direction) % enemiesInRange.Length;
-
-        if (currentTargetIndex < 0)
+        if (Time.time - _lastSwitchTime > _switchTargetCooldown)
         {
-            currentTargetIndex += enemiesInRange.Length;
-        }
+            _lastSwitchTime = Time.time;
+            currentTargetIndex = (currentTargetIndex + direction) % targetsInRange.Length;
 
-        CurrentTarget = enemiesInRange[currentTargetIndex];
+            if (currentTargetIndex < 0)
+            {
+                currentTargetIndex += targetsInRange.Length;
+            }
+
+            CurrentTarget = targetsInRange[currentTargetIndex];
+        }
     }
     
     public void CheckTargetLock()
     {
-        if (CurrentTarget == null || Array.IndexOf(enemiesInRange, CurrentTarget) == -1)
+        Debug.Log("current target= " + CurrentTarget);
+        if (CurrentTarget == null || Array.IndexOf(targetsInRange, CurrentTarget) == -1)
         {
-            if (enemiesInRange.Length > 0)
+            Debug.Log("target is null or not in range");
+            if (targetsInRange.Length > 0)
             {
                 currentTargetIndex = 0; 
-                CurrentTarget = enemiesInRange[currentTargetIndex];
+                CurrentTarget = targetsInRange[currentTargetIndex];
             }
             else
             {
@@ -118,7 +120,7 @@ public class CamTargetLock : MonoBehaviour
 
     private void FixedUpdate()
     {
-        enemiesInRange = DetectEnemiesInRadius();
+        targetsInRange = DetectTargetsInRadius();
     }
     
     void Update()
@@ -129,7 +131,7 @@ public class CamTargetLock : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (IsTargetLocked && CurrentTarget)
+        if (IsTargetLocked && CurrentTarget != null)
         {
             FollowTargetLock();
         }

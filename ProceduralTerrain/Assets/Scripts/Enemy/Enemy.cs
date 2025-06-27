@@ -1,19 +1,21 @@
 using UnityEngine;
 
 [RequireComponent(typeof(IHealth))]
-public class Enemy : MonoBehaviour //add ITargetable interface
+public class Enemy : MonoBehaviour, ITargetable
 {
     private IHealth _health;
+    public Transform TargetTransform => transform;
 
     private void Awake()
     {
         _health = GetComponent<IHealth>();
-        
+
         if (_health is Health healthComponent)
         {
             healthComponent.OnTakeDamage += DamageEffect;
             healthComponent.OnDeath += HandleDeath;
         }
+
         if (_health is ArmouredHealth aHealthComponent)
         {
             aHealthComponent.OnTakeDamage += DamageEffect;
@@ -39,11 +41,13 @@ public class Enemy : MonoBehaviour //add ITargetable interface
             healthComponent.OnTakeDamage -= DamageEffect;
             healthComponent.OnDeath -= HandleDeath;
         }
+
         if (_health is ArmouredHealth aHealthComponent)
         {
             aHealthComponent.OnTakeDamage -= DamageEffect;
             aHealthComponent.OnDeath -= HandleDeath;
         }
+
         Destroy(gameObject);
     }
 }

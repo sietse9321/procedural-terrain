@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -15,6 +12,7 @@ public class EnemyMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!GameManager.Instance.player) return;
         agent.destination = GameManager.Instance.player.transform.position;
     }
 }

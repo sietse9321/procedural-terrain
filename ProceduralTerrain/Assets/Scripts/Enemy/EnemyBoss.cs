@@ -1,9 +1,10 @@
 using UnityEngine;
 
 [RequireComponent(typeof(IHealth))]
-public class EnemyBoss : MonoBehaviour
+public class EnemyBoss : MonoBehaviour, ITargetable
 {
     private IHealth _health;
+    public Transform TargetTransform => transform;
 
     private void Awake()
     {
