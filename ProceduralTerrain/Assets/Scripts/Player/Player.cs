@@ -1,3 +1,5 @@
+using Components;
+using Interfaces;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -11,11 +13,9 @@ public class Player : MonoBehaviour
     private IAttackCombo _attackCombo;
     private IMovement _movement;
     private IDashable _dash;
-    private IHealth _health;
 
     private CamTargetLock _camTargetLock;
 
-    //private Jump _jump;
     private Rigidbody _rb;
 
 
@@ -27,7 +27,6 @@ public class Player : MonoBehaviour
         _input = _inputSwitcher.ActiveInput;
         _dash = GetComponent<IDashable>();
         _movement = GetComponent<Movement>();
-        _health = GetComponent<IHealth>();
         _camTargetLock = GetComponent<CamTargetLock>();
         _rb = GetComponent<Rigidbody>();
         _attackCombo = GetComponent<IAttackCombo>();
@@ -45,6 +44,9 @@ public class Player : MonoBehaviour
         MovementByCamera();
     }
 
+    /// <summary>
+    /// check for movement input
+    /// </summary>
     private void InputUpdate()
     {
         _input = _inputSwitcher.ActiveInput;
@@ -71,11 +73,20 @@ public class Player : MonoBehaviour
             if (_camTargetLock.IsTargetLocked)
             {
                 Vector3 toTarget = (_camTargetLock.CurrentTarget.TargetTransform.position - playerObj.position).normalized;
+                toTarget.y = 0f;
+                if (toTarget != Vector3.zero)
+                {
+                    playerObj.transform.rotation = Quaternion.LookRotation(toTarget);
+                }
+
                 _dash?.DashDirection(toTarget);
             }
         }
     }
 
+    /// <summary>
+    /// changes the movement direction of the player based on the camera
+    /// </summary>
     private void MovementByCamera()
     {
         if (_mainCamera == null) return;

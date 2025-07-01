@@ -1,22 +1,26 @@
+using Interfaces;
 using UnityEngine;
 
-public class EffectOnHit : MonoBehaviour, IHittable
+namespace Components
 {
-    private const string EffectPath = "Effects/HitEffect";
-
-    public void OnHit()
+    public class EffectOnHit : MonoBehaviour, IHittable
     {
-        ParticleSystem effectPrefab = Resources.Load<ParticleSystem>(EffectPath);
-        if (effectPrefab == null)
+        private const string EffectPath = "Effects/HitEffect";
+
+        public void OnHit()
         {
-            Debug.LogWarning($"Particle system at Resources/{EffectPath}.prefab not found!");
-            return;
-        }
+            ParticleSystem effectPrefab = Resources.Load<ParticleSystem>(EffectPath);
+            if (effectPrefab == null)
+            {
+                Debug.LogWarning($"Particle system at Resources/{EffectPath}.prefab not found!");
+                return;
+            }
 
-        ParticleSystem effectInstance = Instantiate(effectPrefab, transform.position, Quaternion.identity);
+            ParticleSystem effectInstance = Instantiate(effectPrefab, transform.position, Quaternion.identity);
         
-        effectInstance.Play();
+            effectInstance.Play();
 
-        Destroy(effectInstance.gameObject, effectInstance.main.duration + effectInstance.main.startLifetime.constantMax);
+            Destroy(effectInstance.gameObject, effectInstance.main.duration + effectInstance.main.startLifetime.constantMax);
+        }
     }
 }

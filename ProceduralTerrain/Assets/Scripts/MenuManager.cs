@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -10,6 +9,9 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private Button firstButton;
     [SerializeField] private Button backButton;
     
+    /// <summary>
+    /// sets the how-to menu active and sets the back button as selected
+    /// </summary>
     public void ShowHowTo()
     {
         mainHolder.SetActive(false);
@@ -17,6 +19,9 @@ public class MenuManager : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(backButton.gameObject);
     }
 
+    /// <summary>
+    /// sets the main menu as active and sets the first button as selected
+    /// </summary>
     public void ShowMain()
     {
         mainHolder.SetActive(true);

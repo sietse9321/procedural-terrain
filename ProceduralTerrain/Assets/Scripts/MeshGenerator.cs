@@ -1,6 +1,5 @@
 using UnityEngine;
 
-
 [RequireComponent(typeof(MeshFilter))]
 public class MeshGenerator : MonoBehaviour
 {
@@ -25,18 +24,20 @@ public class MeshGenerator : MonoBehaviour
     [SerializeField] private float heightPower = 4.71f;
     [SerializeField] private float heightBias = 0.1f;
 
-    [Header("Random Seed")]
+    [Header("Seed")]
     [SerializeField] public string seed = "default";
-    [SerializeField] public bool useRandomSeed = false;
 
     [Header("Height Reference")]
-    [SerializeField] public float maximumHeight = 10f; // Set this in inspector or via WorldManager
+    [SerializeField] public float maximumHeight = 10f;
     [SerializeField] Gradient gradient;
+    
+    //vertex spacing 
+    [SerializeField] private float vertexSpacing = 1f;
 
-    Vector3[] vertices;
-    Color[] colors;
+    Vector3[] _vertices;
+    Color[] _colors;
 
-    private System.Random prng;
+    private System.Random _prng;
 
     //switch to OnValidate for debug 
     private void Awake()
@@ -49,10 +50,10 @@ public class MeshGenerator : MonoBehaviour
         Mesh mesh = new Mesh();
         mesh.vertices = CreateVertices();
         mesh.triangles = CreateTriangles();
-        mesh.colors = colors;
+        mesh.colors = _colors;
 
         mesh.RecalculateNormals();
-        mesh.normals = CalculateNormals(vertices);
+        mesh.normals = CalculateNormals(_vertices);
         meshFilter = GetComponent<MeshFilter>();
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
@@ -65,8 +66,8 @@ public class MeshGenerator : MonoBehaviour
     /// <returns></returns>
     private Vector3[] CreateVertices()
     {
-        vertices = new Vector3[(size.x + 1) * (size.y + 1)];
-        colors = new Color[vertices.Length];
+        _vertices = new Vector3[(size.x + 1) * (size.y + 1)];
+        _colors = new Color[_vertices.Length];
 
         float localMinHeight = float.MaxValue;
         float localMaxHeight = float.MinValue;
@@ -78,7 +79,7 @@ public class MeshGenerator : MonoBehaviour
                 float height = GenerateFractalNoise(x + offset.x, z + offset.y);
                 height = Mathf.Pow(height + heightBias, heightPower);
 
-                vertices[i] = new Vector3(x, height, z);
+                _vertices[i] = new Vector3(x * vertexSpacing, height, z * vertexSpacing);
                 localMinHeight = Mathf.Min(localMinHeight, height);
                 localMaxHeight = Mathf.Max(localMaxHeight, height);
 
@@ -86,16 +87,20 @@ public class MeshGenerator : MonoBehaviour
             }
         }
 
-        // Use the provided maximumHeight for all color normalization across chunks
-        for (int i = 0; i < vertices.Length; i++)
+        //use the provided maximumHeight for all color normalization across chunks
+        for (int i = 0; i < _vertices.Length; i++)
         {
-            float normalizedHeight = Mathf.InverseLerp(0, maximumHeight, vertices[i].y);
-            colors[i] = gradient.Evaluate(normalizedHeight);
+            float normalizedHeight = Mathf.InverseLerp(0, maximumHeight, _vertices[i].y);
+            _colors[i] = gradient.Evaluate(normalizedHeight);
         }
 
-        return vertices;
+        return _vertices;
     }
 
+    /// <summary>
+    /// Makes the vertices into triangles
+    /// </summary>
+    /// <returns></returns>
     private int[] CreateTriangles()
     {
         int[] triangles = new int[size.x * size.y * 6];
@@ -120,6 +125,12 @@ public class MeshGenerator : MonoBehaviour
         return triangles;
     }
 
+    /// <summary>
+    /// Generates a fractal noise map
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="z"></param>
+    /// <returns>the total noise amount</returns>
     private float GenerateFractalNoise(float x, float z)
     {
         float totalNoise = 0f;
@@ -138,6 +149,11 @@ public class MeshGenerator : MonoBehaviour
         return totalNoise;
     }
 
+    /// <summary>
+    /// Calculates the normals for the mesh
+    /// </summary>
+    /// <param name="verts"></param>
+    /// <returns></returns>
     private Vector3[] CalculateNormals(Vector3[] verts)
     {
         Vector3[] normals = new Vector3[verts.Length];
@@ -163,22 +179,29 @@ public class MeshGenerator : MonoBehaviour
         return normals;
     }
 
+   
+    /// <summary>
+    /// Draws a sphere at each vertex of the mesh
+    /// </summary>
     private void OnDrawGizmos()
     {
-        if (vertices == null || !drawGizmos) return;
+        if (_vertices == null || !drawGizmos) return;
 
-        for (int i = 0; i < vertices.Length; i++)
+        for (int i = 0; i < _vertices.Length; i++)
         {
-            Gizmos.DrawSphere(vertices[i], 0.1f);
+            Gizmos.DrawSphere(_vertices[i], 0.1f);
         }
     }
 
+    /// <summary>
+    /// Debug function to analyze the map and print the highest value in the map
+    /// </summary>
     private void AnalyzeMap()
     {
         MapAnalyzer mapAnalyzer = GetComponent<MapAnalyzer>();
-        if (mapAnalyzer != null && vertices != null)
+        if (mapAnalyzer != null && _vertices != null)
         {
-            mapAnalyzer.PrintHighestValue(vertices);
+            mapAnalyzer.PrintHighestValue(_vertices);
         }
     }
 }

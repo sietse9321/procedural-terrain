@@ -1,16 +1,20 @@
+using Interfaces;
 using UnityEngine;
 
-public class DropItem : MonoBehaviour, IHittable
+namespace Components
 {
-    public void OnHit()
+    public class DropItem : MonoBehaviour, IHittable
     {
-        if (TryGetComponent(out IHealth health) && !health.IsAlive())
+        public void OnHit()
         {
-            Debug.Log("drop item");
-        }
-        else
-        {
-            Debug.Log("drop item");
+            if (TryGetComponent(out IHealth health) && !health.IsAlive())
+            {
+                Debug.Log("drop item");
+            }
+            else
+            {
+                Debug.Log("drop item");
+            }
         }
     }
 }

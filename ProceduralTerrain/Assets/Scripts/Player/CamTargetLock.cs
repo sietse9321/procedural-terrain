@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Cinemachine;
+using Interfaces;
 using UnityEngine;
 
 public class CamTargetLock : MonoBehaviour
@@ -9,28 +10,26 @@ public class CamTargetLock : MonoBehaviour
     [SerializeField] GameObject targetCanvas;
     [SerializeField] Camera mainCamera;
     [SerializeField] CinemachineFreeLook defaultCamera;
-    [SerializeField] float distanceBehindPlayer = 10f;
     [SerializeField] float heightOffset = 1.75f;
     [SerializeField] float followSmoothing = 0.1f;
     private float _switchTargetCooldown = 0.2f;
     private float _lastSwitchTime = -999f;
-    private const float TargetLockDistance = 4f;
+    private const float TargetLockDistance = 5f;
     private const float DetectionRadius = 10f;
 
-    public ITargetable CurrentTarget { get; private set; }
+    public IEnemy CurrentTarget { get; private set; }
     public bool IsTargetLocked { get; private set; }
-    private int currentTargetIndex;
-    ITargetable[] targetsInRange;
-    
+    private int _currentTargetIndex;
+    IEnemy[] _targetsInRange;
 
-    public ITargetable[] DetectTargetsInRadius()
+    private IEnemy[] DetectTargetsInRadius()
     {
         Collider[] colliders = Physics.OverlapSphere(transform.position, DetectionRadius);
-        List<ITargetable> foundTargets = new List<ITargetable>();
+        List<IEnemy> foundTargets = new List<IEnemy>();
 
         foreach (Collider col in colliders)
         {
-            ITargetable target = col.GetComponentInParent<ITargetable>();
+            IEnemy target = col.GetComponentInParent<IEnemy>();
             if (target != null && !foundTargets.Contains(target))
             {
                 foundTargets.Add(target);
@@ -73,10 +72,10 @@ public class CamTargetLock : MonoBehaviour
         CurrentTarget = null;
         SetTargetLock(IsTargetLocked);
 
-        if (targetsInRange.Length == 0)
+        if (_targetsInRange.Length == 0)
             return;
 
-        CurrentTarget = targetsInRange[currentTargetIndex];
+        CurrentTarget = _targetsInRange[_currentTargetIndex];
         IsTargetLocked = !IsTargetLocked;
 
         defaultCamera.gameObject.SetActive(!IsTargetLocked);
@@ -87,27 +86,27 @@ public class CamTargetLock : MonoBehaviour
         if (Time.time - _lastSwitchTime > _switchTargetCooldown)
         {
             _lastSwitchTime = Time.time;
-            currentTargetIndex = (currentTargetIndex + direction) % targetsInRange.Length;
+            _currentTargetIndex = (_currentTargetIndex + direction) % _targetsInRange.Length;
 
-            if (currentTargetIndex < 0)
+            if (_currentTargetIndex < 0)
             {
-                currentTargetIndex += targetsInRange.Length;
+                _currentTargetIndex += _targetsInRange.Length;
             }
 
-            CurrentTarget = targetsInRange[currentTargetIndex];
+            CurrentTarget = _targetsInRange[_currentTargetIndex];
         }
     }
     
     public void CheckTargetLock()
     {
         Debug.Log("current target= " + CurrentTarget);
-        if (CurrentTarget == null || Array.IndexOf(targetsInRange, CurrentTarget) == -1)
+        if (CurrentTarget == null || Array.IndexOf(_targetsInRange, CurrentTarget) == -1)
         {
             Debug.Log("target is null or not in range");
-            if (targetsInRange.Length > 0)
+            if (_targetsInRange.Length > 0)
             {
-                currentTargetIndex = 0; 
-                CurrentTarget = targetsInRange[currentTargetIndex];
+                _currentTargetIndex = 0; 
+                CurrentTarget = _targetsInRange[_currentTargetIndex];
             }
             else
             {
@@ -120,7 +119,7 @@ public class CamTargetLock : MonoBehaviour
 
     private void FixedUpdate()
     {
-        targetsInRange = DetectTargetsInRadius();
+        _targetsInRange = DetectTargetsInRadius();
     }
     
     void Update()

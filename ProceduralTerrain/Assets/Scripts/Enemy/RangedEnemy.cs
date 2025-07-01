@@ -1,7 +1,9 @@
+using Components;
+using Interfaces;
 using UnityEngine;
 
 [RequireComponent(typeof(IHealth))]
-public class RangedEnemy : MonoBehaviour, ITargetable
+public class RangedEnemy : MonoBehaviour, IEnemy
 {
     private IHealth _health;
     public Transform TargetTransform => transform;
@@ -21,7 +23,7 @@ public class RangedEnemy : MonoBehaviour, ITargetable
             aHealthComponent.OnDeath += HandleDeath;
         }
 
-        _health.MaxHealth = 75;
+        _health.MaxHealth = 30;
     }
 
     private void DamageEffect(int damageAmount)

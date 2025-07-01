@@ -1,4 +1,5 @@
 using System.Collections;
+using Interfaces;
 using UnityEngine;
 
 public class ShakeOnHit : MonoBehaviour, IHittable

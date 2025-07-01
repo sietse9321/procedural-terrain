@@ -6,13 +6,13 @@ public class Jump : MonoBehaviour
     [SerializeField] private int maxJumps = 1;
     [SerializeField] private float groundCheckDistance = 1f;
 
-    private Rigidbody rb;
-    private int jumpsRemaining;
-    private bool isGrounded;
+    private Rigidbody _rb;
+    private int _jumpsRemaining;
+    private bool _isGrounded;
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+        _rb = GetComponent<Rigidbody>();
         ResetJumpCount();
     }
 
@@ -23,19 +23,19 @@ public class Jump : MonoBehaviour
 
     public void TryJump()
     {
-        if (isGrounded || jumpsRemaining > 0)
+        if (_isGrounded || _jumpsRemaining > 0)
         {
-            rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            jumpsRemaining--;
+            _rb.velocity = new Vector3(_rb.velocity.x, 0, _rb.velocity.z);
+            _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            _jumpsRemaining--;
         }
     }
 
     private void CheckGround()
     {
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance);
+        _isGrounded = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance);
 
-        if (isGrounded)
+        if (_isGrounded)
         {
             ResetJumpCount();
         }
@@ -43,6 +43,6 @@ public class Jump : MonoBehaviour
 
     private void ResetJumpCount()
     {
-        jumpsRemaining = maxJumps;
+        _jumpsRemaining = maxJumps;
     }
 }

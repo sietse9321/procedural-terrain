@@ -1,12 +1,15 @@
 using TMPro;
 using System;
+using Components;
+using Enemy;
+using Interfaces;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    private static GameManager instance;
-    public static GameManager Instance => instance;
+    private static GameManager _instance;
+    public static GameManager Instance => _instance;
 
     public Player player;
     public EnemyBoss bossEnemy;
@@ -15,13 +18,14 @@ public class GameManager : MonoBehaviour
     
     private void Awake()
     {
-        if (instance != null && instance != this)
+        //check if there is a instance of the game manager already
+        if (_instance != null && _instance != this)
         {
             Destroy(gameObject);
             return;
         }
 
-        instance = this;
+        _instance = this;
         DontDestroyOnLoad(gameObject);
     }
 
@@ -29,7 +33,10 @@ public class GameManager : MonoBehaviour
     {
         SceneManagement();
     }
-
+    
+    /// <summary>
+    /// sets variables for the scene based on the scene index
+    /// </summary>
     private void SceneManagement()
     {
         switch (SceneManager.GetActiveScene().buildIndex)
@@ -64,11 +71,11 @@ public class GameManager : MonoBehaviour
     }
 
     public static Action PlayerDefeated;
-
     private void OnPlayerDeath()
     {
         Debug.Log("Game Over: Player is dead!");
         // Handle game over logic here (UI, scene, etc.)
+        player.gameObject.SetActive(false);
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         PlayerDefeated?.Invoke();

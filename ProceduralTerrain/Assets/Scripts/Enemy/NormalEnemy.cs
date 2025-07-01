@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Enemy
 {
     [RequireComponent(typeof(IHealth))]
-    public class EnemyBoss : MonoBehaviour, IEnemy
+    public class NormalEnemy : MonoBehaviour, IEnemy
     {
         private IHealth _health;
         public Transform TargetTransform => transform;
@@ -13,19 +13,20 @@ namespace Enemy
         private void Awake()
         {
             _health = GetComponent<IHealth>();
-        
+
             if (_health is Health healthComponent)
             {
                 healthComponent.OnTakeDamage += DamageEffect;
                 healthComponent.OnDeath += HandleDeath;
             }
+
             if (_health is ArmouredHealth aHealthComponent)
             {
                 aHealthComponent.OnTakeDamage += DamageEffect;
                 aHealthComponent.OnDeath += HandleDeath;
             }
 
-            _health.MaxHealth = 200;
+            _health.MaxHealth = 50;
         }
 
         private void DamageEffect(int damageAmount)
@@ -44,11 +45,13 @@ namespace Enemy
                 healthComponent.OnTakeDamage -= DamageEffect;
                 healthComponent.OnDeath -= HandleDeath;
             }
+
             if (_health is ArmouredHealth aHealthComponent)
             {
                 aHealthComponent.OnTakeDamage -= DamageEffect;
                 aHealthComponent.OnDeath -= HandleDeath;
             }
+
             Destroy(gameObject);
         }
     }

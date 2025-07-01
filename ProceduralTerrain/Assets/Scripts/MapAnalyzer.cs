@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class MapAnalyzer : MonoBehaviour
 {
+    /// <summary>
+    /// prints the highest Y value in the map.
+    /// </summary>
+    /// <param name="vertices">An array of Vector3 objects representing the vertices of a mesh.</param>
     public void PrintHighestValue(Vector3[] vertices)
     {
         if (vertices == null || vertices.Length == 0)

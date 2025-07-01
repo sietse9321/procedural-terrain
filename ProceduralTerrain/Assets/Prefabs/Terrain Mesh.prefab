@@ -142,6 +142,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 6
     m_NumAlphaKeys: 2
+  vertexSpacing: 1
 --- !u!64 &1542692829454309305
 MeshCollider:
   m_ObjectHideFlags: 0

@@ -1,15 +1,24 @@
+using Interfaces;
 using UnityEngine;
 
-public class Movement : MonoBehaviour, IMovement
+namespace Components
 {
-    public float MoveSpeed { get; set; }
-
-    public void Move(Vector3 direction)
+    public class Movement : MonoBehaviour, IMovement
     {
-        if (direction.sqrMagnitude > 0)
+        public float MoveSpeed { get; set; }
+
+    
+        /// <summary>
+        /// Moves in the direction of the vector
+        /// </summary>
+        /// <param name="direction"></param>
+        public void Move(Vector3 direction)
         {
-            Vector3 movement = direction.normalized * MoveSpeed * Time.deltaTime;
-            transform.Translate(movement, Space.World);
+            if (direction.sqrMagnitude > 0)
+            {
+                Vector3 movement = direction.normalized * MoveSpeed * Time.deltaTime;
+                transform.Translate(movement, Space.World);
+            }
         }
     }
 }

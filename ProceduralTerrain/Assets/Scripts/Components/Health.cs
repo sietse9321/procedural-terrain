@@ -1,53 +1,67 @@
 using UnityEngine;
 using System;
+using Interfaces;
 
-public class Health : MonoBehaviour, IHealth
+namespace Components
 {
-    [SerializeField] private int maxHealth;
-    private int currentHealth;
-
-    public event Action<int> OnTakeDamage;
-    public event Action OnDeath;
-
-    public int CurrentHealth => currentHealth;
-
-    public int MaxHealth
+    public class Health : MonoBehaviour, IHealth
     {
-        get => maxHealth;
-        set => maxHealth = Mathf.Max(0, value);
-    }
+        [SerializeField] private int maxHealth;
+        private int _currentHealth;
 
-    private void Awake()
-    {
-        currentHealth = maxHealth;
-    }
+        public event Action<int> OnTakeDamage;
+        public event Action OnDeath;
 
-    public void TakeDamage(int pDamage)
-    {
-        if (pDamage <= 0 || currentHealth <= 0) return;
+        public int CurrentHealth => _currentHealth;
 
-        currentHealth -= pDamage;
-        OnTakeDamage?.Invoke(pDamage);
-        Debug.Log($"{gameObject.name} took {pDamage} damage. Remaining health: {currentHealth}");
-
-        if (currentHealth <= 0)
+        public int MaxHealth
         {
-            OnDeath?.Invoke();
+            get => maxHealth;
+            set => maxHealth = Mathf.Max(0, value);
         }
-    }
 
-    public void Heal(int pHeal)
-    {
-        if (pHeal <= 0 || currentHealth == maxHealth) return;
+        private void Awake()
+        {
+            _currentHealth = maxHealth;
+        }
 
-        currentHealth += pHeal;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        /// <summary>
+        /// Reduces the health by the incoming damage
+        /// invokes OnTakeDamage event
+        /// invokes OnDeath event if health is 0 or less
+        /// </summary>
+        /// <param name="pDamage"></param>
+        public void TakeDamage(int pDamage)
+        {
+            if (pDamage <= 0 || _currentHealth <= 0) return;
 
-        Debug.Log($"{gameObject.name} healed for {pHeal}. Current health: {currentHealth}");
-    }
+            _currentHealth -= pDamage;
+            OnTakeDamage?.Invoke(pDamage);
+            Debug.Log($"{gameObject.name} took {pDamage} damage. Remaining health: {_currentHealth}");
 
-    public bool IsAlive()
-    {
-        return currentHealth > 0;
+            if (_currentHealth <= 0)
+            {
+                OnDeath?.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// Increase the health by the incoming heal
+        /// </summary>
+        /// <param name="pHeal"></param>
+        public void Heal(int pHeal)
+        {
+            if (pHeal <= 0 || _currentHealth == maxHealth) return;
+
+            _currentHealth += pHeal;
+            _currentHealth = Mathf.Clamp(_currentHealth, 0, maxHealth);
+
+            Debug.Log($"{gameObject.name} healed for {pHeal}. Current health: {_currentHealth}");
+        }
+        
+        public bool IsAlive()
+        {
+            return _currentHealth > 0;
+        }
     }
 }

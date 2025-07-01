@@ -1,3 +1,4 @@
+using Interfaces;
 using UnityEngine;
 
 public class InputSwitcher : MonoBehaviour
@@ -7,7 +8,7 @@ public class InputSwitcher : MonoBehaviour
 
     public IPlayerInput ActiveInput { get; private set; }
 
-    private string lastUsedInput = "Keyboard";
+    private string _lastUsedInput = "Keyboard";
 
     void Awake()
     {
@@ -24,14 +25,14 @@ public class InputSwitcher : MonoBehaviour
         // Detect gamepad movement input using HorizontalG/VerticalG
         if (Mathf.Abs(Input.GetAxisRaw("HorizontalG")) > 0.1f || Mathf.Abs(Input.GetAxisRaw("VerticalG")) > 0.1f)
         {
-            if (lastUsedInput != "Controller")
+            if (_lastUsedInput != "Controller")
                 SetActiveInput("Controller");
         }
         // Detect keyboard movement input using Horizontal/Vertical OR mouse buttons/scroll
         else if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) > 0.1f || Mathf.Abs(Input.GetAxisRaw("Vertical")) > 0.1f
                 || Input.anyKeyDown || Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(2) || Input.mouseScrollDelta.y != 0f)
         {
-            if (lastUsedInput != "Keyboard")
+            if (_lastUsedInput != "Keyboard")
                 SetActiveInput("Keyboard");
         }
     }
@@ -41,12 +42,12 @@ public class InputSwitcher : MonoBehaviour
         if (inputType == "Keyboard")
         {
             ActiveInput = keyboardInput;
-            lastUsedInput = "Keyboard";
+            _lastUsedInput = "Keyboard";
         }
         else if (inputType == "Controller")
         {
             ActiveInput = controllerInput;
-            lastUsedInput = "Controller";
+            _lastUsedInput = "Controller";
         }
     }
 }

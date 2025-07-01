@@ -1,3 +1,4 @@
+using Interfaces;
 using UnityEngine;
 
 public class SwordAttackCombo : MonoBehaviour, IAttackCombo
@@ -7,19 +8,19 @@ public class SwordAttackCombo : MonoBehaviour, IAttackCombo
     [SerializeField] private float comboResetTime = 1.0f;
 
     [SerializeField] private int currentCombo = 0;
-    private float lastAttackTime = 0f;
-    private bool isAttacking = false;
+    private float _lastAttackTime = 0f;
+    private bool _isAttacking = false;
 
-    public bool CanAttack => !isAttacking || (Time.time - lastAttackTime < comboResetTime);
+    public bool CanAttack => !_isAttacking || (Time.time - _lastAttackTime < comboResetTime);
 
     void Update()
     {
         //reset combo if too much time passes
-        if (isAttacking && Time.time - lastAttackTime > comboResetTime)
+        if (_isAttacking && Time.time - _lastAttackTime > comboResetTime)
         {
             Debug.Log("reset combo");
             currentCombo = 0;
-            isAttacking = false;
+            _isAttacking = false;
             animator.SetInteger("AttackIndex", currentCombo);
             animator.SetBool("Attack", false);
         }
@@ -29,7 +30,7 @@ public class SwordAttackCombo : MonoBehaviour, IAttackCombo
     {
         if (!CanAttack) return;
 
-        if (isAttacking)
+        if (_isAttacking)
         {
             currentCombo = (currentCombo % maxCombo) + 1;
         }
@@ -38,12 +39,12 @@ public class SwordAttackCombo : MonoBehaviour, IAttackCombo
             currentCombo = 1;
         }
 
-        lastAttackTime = Time.time;
+        _lastAttackTime = Time.time;
 
         animator.SetInteger("AttackIndex", currentCombo);
         animator.SetBool("Attack", true);
 
-        isAttacking = true;
+        _isAttacking = true;
     }
 
     

@@ -1,31 +1,34 @@
 using UnityEngine;
 
-public class ExplodeOnDeath : MonoBehaviour
+namespace Components
 {
-    private Health _health;
-
-    private void Awake()
+    public class ExplodeOnDeath : MonoBehaviour
     {
-        _health = GetComponent<Health>();
-        if (_health != null)
+        private Health _health;
+
+        private void Awake()
         {
-            _health.OnDeath += OnDeathHandler;
+            _health = GetComponent<Health>();
+            if (_health != null)
+            {
+                _health.OnDeath += OnDeathHandler;
+            }
         }
-    }
 
-    private void OnDeathHandler()
-    {
-        Debug.Log($"{gameObject.name} triggered OnDeath event!");
-        
-        //play breaking animation
-        Destroy(gameObject);
-    }
-
-    private void OnDestroy()
-    {
-        if (_health != null)
+        private void OnDeathHandler()
         {
-            _health.OnDeath -= OnDeathHandler;
+            Debug.Log($"{gameObject.name} triggered OnDeath event!");
+        
+            //play breaking animation
+            Destroy(gameObject);
+        }
+
+        private void OnDestroy()
+        {
+            if (_health != null)
+            {
+                _health.OnDeath -= OnDeathHandler;
+            }
         }
     }
 }

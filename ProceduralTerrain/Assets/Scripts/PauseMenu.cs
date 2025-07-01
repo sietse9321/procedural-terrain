@@ -7,19 +7,19 @@ public class PauseMenu : MonoBehaviour
     [SerializeField] GameObject pauseObject;
     [SerializeField] Button firstPauseButton;
 
-    bool paused;
+    bool _paused;
     void Update()
     {
-        if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton7)) && !paused)
+        if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton7)) && !_paused)
         {
             Cursor.visible = true;
             Time.timeScale = 0;
             pauseObject.SetActive(true);
             Cursor.lockState = CursorLockMode.None;
-            paused = true;
+            _paused = true;
             EventSystem.current.SetSelectedGameObject(firstPauseButton.gameObject);
         }
-        else if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton7)) && paused)
+        else if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton7)) && _paused)
         {
             ResumeGame();
         }
@@ -30,7 +30,7 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1;
         Cursor.lockState = CursorLockMode.Locked;
         pauseObject.SetActive(false);
-        paused = false;
+        _paused = false;
     }
     
     public void OnHover(Image img)
